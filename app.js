@@ -10,7 +10,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.post("/sendEmail", async (req, res) => {
-  const { user, pass, to, subject, text } = req.body;
+  const { user, pass, to, subject, text, filename, content } = req.body;
   const transporter = nodemailer.createTransport({
     service: "Gmail",
     auth: {
@@ -25,6 +25,14 @@ app.post("/sendEmail", async (req, res) => {
   const mailOptions = {
     from: user,
     to,
+    attachments: filename
+      ? [
+          {
+            filename,
+            content,
+          },
+        ]
+      : null,
     subject,
     text,
   };

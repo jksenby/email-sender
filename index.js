@@ -7,10 +7,15 @@ const text = document.querySelector("#text");
 const valid = document.querySelector("#valid");
 const invalid = document.querySelector("#invalid");
 const loading = document.querySelector("#loading");
+const file = document.querySelector("#file");
+let content = null;
+
+file.addEventListener("change", (e) => {
+  readText(e).then((res) => (content = res));
+});
 
 form.addEventListener("submit", (e) => {
   e.preventDefault();
-
   loading.innerHTML = '<i class="fa-solid fa-spinner fa-spin-pulse fa-xl"></i>';
 
   const mail = {
@@ -19,10 +24,18 @@ form.addEventListener("submit", (e) => {
     to: to.value,
     subject: subject.value,
     text: text.value,
+    attachment: file.value,
+    filename: file?.files[0]?.name,
+    content: file?.files[0] ? content : null,
   };
 
   sendEmail(mail);
 });
+
+async function readText(event) {
+  const file = event.target.files.item(0);
+  return await file.text();
+}
 
 async function sendEmail(mail) {
   const options = {
@@ -32,18 +45,24 @@ async function sendEmail(mail) {
     },
     body: JSON.stringify(mail),
   };
+  try {
+    const response = await fetch("http://localhost:3000/sendEmail", options);
 
-  const response = await fetch("http://localhost:3000/sendEmail", options);
-
-  if (!response.ok) {
+    if (!response.ok) {
+      const result = await response.json();
+      valid.textContent = "";
+      invalid.textContent = result.message;
+      loading.innerHTML = "";
+      return;
+    }
     const result = await response.json();
+    invalid.textContent = "";
+    valid.textContent = "Email sent: " + result.message;
+    loading.innerHTML = "";
+  } catch (e) {
     valid.textContent = "";
-    invalid.textContent = result.message;
+    invalid.textContent = e.message;
     loading.innerHTML = "";
     return;
   }
-  const result = await response.json();
-  invalid.textContent = "";
-  valid.textContent = "Email sent: " + result.message;
-  loading.innerHTML = "";
 }
