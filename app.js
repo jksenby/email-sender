@@ -10,9 +10,12 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.post("/sendEmail", async (req, res) => {
-  const { user, pass, to, subject, text, filename, content } = req.body;
+  const { user, pass, to, subject, text, filename, content, service } =
+    req.body;
   const transporter = nodemailer.createTransport({
-    service: "Gmail",
+    host: "smtp" + service,
+    secure: false,
+    port: 587,
     auth: {
       user,
       pass,

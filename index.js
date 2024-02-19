@@ -8,6 +8,8 @@ const valid = document.querySelector("#valid");
 const invalid = document.querySelector("#invalid");
 const loading = document.querySelector("#loading");
 const file = document.querySelector("#file");
+const service = document.querySelector("#service");
+
 let content = null;
 
 file.addEventListener("change", (e) => {
@@ -27,6 +29,7 @@ form.addEventListener("submit", (e) => {
     attachment: file.value,
     filename: file?.files[0]?.name,
     content: file?.files[0] ? content : null,
+    service: service.value,
   };
 
   sendEmail(mail);
